@@ -1,0 +1,8 @@
+node_modules/
+.env
+src/generated/prisma/
+.temporal/*
+!.temporal/.gitkeep
+coverage/
+*.log
+.DS_Store

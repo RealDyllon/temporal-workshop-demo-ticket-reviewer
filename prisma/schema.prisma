@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ReviewStatus {
+  RECEIVED
+  READY_FOR_REVIEW
+  ASSIGNED
+  REVIEWED
+  ACCEPTED
+  REJECTED_FINAL
+  REJECTED_ALLOW_RESUBMISSION
+}
+
+enum ReviewDecision {
+  ACCEPT
+  REJECT
+}
+
+enum RejectionMode {
+  FINAL
+  ALLOW_RESUBMISSION
+}
+
+model ReviewCase {
+  id                      String          @id @default(cuid())
+  workflowId              String          @unique
+  externalId              String
+  externalVersion         Int
+  title                   String
+  payload                 Json
+  sourceUpdatedAt         DateTime
+  status                  ReviewStatus
+  assignedUserId          String?
+  reviewedByUserId        String?
+  decision                ReviewDecision?
+  rejectionMode           RejectionMode?
+  reviewNotes             String?
+  outcomeDeliveredAt      DateTime?
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+
+  @@unique([externalId, externalVersion])
+  @@index([status])
+  @@index([assignedUserId, status])
+}
+
+model PollCursor {
+  source    String   @id
+  sequence  Int      @default(0)
+  updatedAt DateTime @updatedAt
+}

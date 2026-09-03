@@ -1,0 +1,54 @@
+{
+  "name": "temporal-review-workshop-starter",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A 90-minute Temporal TypeScript workshop starter for a human review workflow.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "npm run db:generate && npm run typecheck && npm run workflow:bundle-check",
+    "check": "npm run build && npm test",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "concurrently --kill-others --names mock,api,worker,poller --prefix-colors magenta,cyan,green,yellow \"npm:dev:mock\" \"npm:dev:api\" \"npm:dev:worker\" \"npm:dev:poller\"",
+    "dev:api": "node --watch --import tsx src/apps/api.ts",
+    "dev:mock": "node --watch --import tsx src/apps/mock-external-api.ts",
+    "dev:poller": "node --watch --import tsx src/apps/poller.ts",
+    "dev:worker": "node --watch --import tsx src/apps/worker.ts",
+    "start:api": "node --import tsx src/apps/api.ts",
+    "start:mock": "node --import tsx src/apps/mock-external-api.ts",
+    "start:poller": "node --import tsx src/apps/poller.ts",
+    "start:worker": "node --import tsx src/apps/worker.ts",
+    "temporal:start": "mkdir -p .temporal && temporal server start-dev --db-filename .temporal/temporal.db",
+    "db:start": "docker compose up -d --wait postgres",
+    "db:stop": "docker compose stop postgres",
+    "db:logs": "docker compose logs -f postgres",
+    "db:generate": "CHECKPOINT_DISABLE=1 PRISMA_GENERATE_SKIP_AUTOINSTALL=1 prisma generate",
+    "db:migrate": "CHECKPOINT_DISABLE=1 prisma migrate deploy",
+    "db:setup": "npm run db:generate && npm run db:migrate",
+    "db:studio": "prisma studio",
+    "workflow:bundle-check": "node --import tsx scripts/check-workflow-bundle.ts"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "@temporalio/client": "1.23.0",
+    "@temporalio/common": "1.23.0",
+    "@temporalio/worker": "1.23.0",
+    "@temporalio/workflow": "1.23.0",
+    "dotenv": "17.4.2",
+    "fastify": "5.12.1",
+    "pg": "8.23.0",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "26.4.1",
+    "concurrently": "10.0.5",
+    "prisma": "7.10.0",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vitest": "4.1.11"
+  }
+}
